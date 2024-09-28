@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "392712264095",
+    "project_id": "travelhope-709dc",
+    "storage_bucket": "travelhope-709dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392712264095:android:9070fe19ad86c6e6d145aa",
+        "android_client_info": {
+          "package_name": "com.hotelbookingapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2Jtds_sk67ekQD14J4Bd372FAIBct_uo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
