@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import RoundedImage from '../components/RoundedImage';
 import RoundedBox from '../components/RoundedBox';
 import ChangePasswordBottomSheet from './ChangePasswordBottomSheet';
-import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import AboutApp from './AboutApp';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
@@ -27,12 +27,19 @@ const ProfileScreen: React.FC<Props> = ({ navigation, route }) => {
     const toggleAboutModal = () => {
         setAboutModalVisible(!isAboutModalVisible);
     }
+
+    const handleLogout = () => {
+        navigation.reset({ //clears the navigation stack and sets a new stack with the specified routes.
+            index: 0,
+            routes: [{ name: 'Splash' }]
+        })
+    }
     return (
 
         <View>
             <View style={styles.header}>
                 <TouchableOpacity onPress={handleBackPress}>
-                <Icon name="arrow-back" size={24} color="#000" />
+                    <Icon name="arrow-back" size={24} color="#000" />
                 </TouchableOpacity>
                 <Text style={styles.text}>Profile</Text>
             </View>
@@ -53,12 +60,15 @@ const ProfileScreen: React.FC<Props> = ({ navigation, route }) => {
                     text={user?.phone} />
                 <TouchableOpacity onPress={toggleAboutModal}>
                     <Text style={styles.aboutApp}>About the App  ℹ️ </Text>
-                </TouchableOpacity>    
+                </TouchableOpacity>
                 <AboutApp isVisible={isAboutModalVisible} onClose={toggleAboutModal} />
                 <TouchableOpacity onPress={toggleModal}>
                     <Text style={styles.changePassword}>Change Password ?</Text>
                 </TouchableOpacity>
                 <ChangePasswordBottomSheet isVisible={isModalVisible} onClose={toggleModal} />
+                <TouchableOpacity onPress={handleLogout}>
+                    <Text style={styles.logout}>Logout  📴 </Text>
+                </TouchableOpacity>
             </View>
         </View>
     )
@@ -104,5 +114,14 @@ const styles = StyleSheet.create({
         marginTop: 24,
         color: '#000000',
         fontFamily: 'PlusJakartaSans-SemiBold'
-    }
+    },
+    logout: {
+        width: '60%',
+        fontSize: 14,
+        color: '#000000',
+        paddingHorizontal: 24,
+        paddingVertical: 24,
+        fontFamily: 'PlusJakartaSans-Italic-VariableFont_wght'
+    },
+
 })
