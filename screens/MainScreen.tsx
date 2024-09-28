@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, Text, View, Dimensions, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native'
+import { ImageBackground, StyleSheet, Text, View, Dimensions, TouchableOpacity, FlatList, Image, ActivityIndicator, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import GetLocation, { Location, LocationErrorCode, isLocationError, } from 'react-native-get-location'
 import Geocoder from 'react-native-geocoding';
@@ -12,7 +12,7 @@ import { fetchHotelsRequest } from '../hotelList/action';
 import { HotelState } from '../hotelList/reducer';
 import { ThunkDispatch } from 'redux-thunk';
 import { HotelActions } from '../hotelList/action';  // Your actions
-import { Hotel } from '../hotelList/type';
+import { Hotel, HotelListState } from '../hotelList/type';
 import { database } from '../firebaseConfig'; // adjust the path as needed
 import { ref, onValue } from 'firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -45,6 +45,7 @@ const MainScreen: React.FC<Props> = ({ navigation, route }) => {
   let cityName: string = '';
   let hotelData: Hotel[];
   const hotelList = useSelector((state: HotelState) => state.hotelList);
+  const hotelLoading = useSelector((state:HotelState)=>state.hotelLoading);
   const [recentSearchData, seRecentSearchData] = useState<RecentSearch[]>([]);
   const [loadingRecentSearch, setRecentSearchLoading] = useState<boolean>(true);
   useEffect(() => {
@@ -156,7 +157,14 @@ const MainScreen: React.FC<Props> = ({ navigation, route }) => {
     navigation.navigate('HotelItemScreen', { hotel });
   };
 
-  const showFlatList = () => {
+  if(hotelLoading){
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+  const showNearByFlatList = () => {
     if (hotelList != null) {
       //  console.log("Hotel list:", hotelList);
       // Access the results
@@ -180,14 +188,14 @@ const MainScreen: React.FC<Props> = ({ navigation, route }) => {
       }
     }
     return (
-      <View>
+      <View>{}
         <FlatList
           data={hotelData}
           renderItem={({ item }) =>
             <View>
               <View style={[styles.cardItem, styles.cardItemElevated]}>
                 <TouchableOpacity onPress={() => navigateToHotelItemScreen(item)}>
-                  <Image source={{ uri: item.icon }}
+                  <Image source={{ uri: 'https://i.pinimg.com/564x/40/4b/8c/404b8c70135db5f5d896fca01ace09cc.jpg' }}
                     style={styles.cardItemImage} />
                 </TouchableOpacity>
                 <View style={styles.cardItemBody}>
@@ -223,50 +231,56 @@ const MainScreen: React.FC<Props> = ({ navigation, route }) => {
     </View>
   );
 
-  const showRecentSearch = (recentSearchData:RecentSearch[]) => {
-    return (
-      <View>
-        <Text style={styles.recentSearch}>Recent Search</Text>
-        <FlatList
-          data={recentSearchData}
-          renderItem={({ item }) => <UserSearchItem search={item} />}
-          keyExtractor={(item) => item.hotelId}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
-    );
+  const showRecentSearch = (recentSearchData: RecentSearch[]) => {
+    if (recentSearchData != null) {
+      return (
+        <View>
+          <Text style={styles.recentSearch}>Recent Search</Text>
+          <FlatList
+            data={recentSearchData}
+            renderItem={({ item }) => <UserSearchItem search={item} />}
+            keyExtractor={(item) => item.hotelId}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+      );
+    }
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.blackSelection}>
-        <ImageBackground
-          source={{ uri: 'https://i.pinimg.com/564x/d7/cd/e5/d7cde59fd45fa298763c24c1e6ad7f0b.jpg' }}
-          style={styles.image}
-          resizeMode='cover'>
-          <Text style={styles.text}>Location</Text>
-          {address ? (
-            <Text style={styles.location} numberOfLines={2}>{address}</Text>
-          ) : null}
-          {error ? <Text style={styles.error} numberOfLines={1}>Error: {error}</Text> : null}
-          <View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}>
+          <ImageBackground
+            source={{ uri: 'https://i.pinimg.com/564x/d7/cd/e5/d7cde59fd45fa298763c24c1e6ad7f0b.jpg' }}
+            style={styles.image}
+            resizeMode='cover'>
+            <Text style={styles.text}>Location</Text>
             {address ? (
-              <SearchBar
-                text="Look for home stay"
-                imageSource={require('../assets/ic_search_symbol.png')}
-                onPress={() => handleSearchPress(address)} />
+              <Text style={styles.location} numberOfLines={2}>{address}</Text>
             ) : null}
-
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.nearbyText}>Nearby Hotels</Text>
-            {showFlatList()}
+            {error ? <Text style={styles.error} numberOfLines={1}>Error: {error}</Text> : null}
             <View>
-              {recentSearchData ? (showRecentSearch(recentSearchData)) : null}
+              {address ? (
+                <SearchBar
+                  text="Look for home stay"
+                  imageSource={require('../assets/ic_search_symbol.png')}
+                  onPress={() => handleSearchPress(address)} />
+              ) : null}
+
             </View>
-          </View>
-        </ImageBackground>
+            <View style={styles.card}>
+              <Text style={styles.nearbyText}>Nearby Hotels</Text>
+              {showNearByFlatList()}
+              <View>
+                {recentSearchData ? (showRecentSearch(recentSearchData)) : null}
+              </View>
+            </View>
+          </ImageBackground>
+        </ScrollView>
+
       </View>
     </View>
   )
@@ -343,7 +357,7 @@ const styles = StyleSheet.create({
   },
   cardItem: {
     width: 180,
-    height: 200,
+    height: 180,
     borderRadius: 6,
     marginHorizontal: 8,
     marginVertical: 12,
@@ -385,5 +399,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingHorizontal: 24,
     fontFamily: 'PlusJakartaSans-ExtraBold'
+  },
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 })

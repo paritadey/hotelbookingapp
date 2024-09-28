@@ -8,11 +8,13 @@ import RoundedImage from '../components/RoundedImage';
 import RoundedBox from '../components/RoundedBox';
 import ChangePasswordBottomSheet from './ChangePasswordBottomSheet';
 import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import AboutApp from './AboutApp';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
 
 const ProfileScreen: React.FC<Props> = ({ navigation, route }) => {
     const [isModalVisible, setModalVisible] = useState(false);
+    const [isAboutModalVisible, setAboutModalVisible] = useState(false);
     const user = useSelector((state: RootState) => state.auth.user);
     console.log("User data:", user);
     const handleBackPress = () => {
@@ -22,6 +24,9 @@ const ProfileScreen: React.FC<Props> = ({ navigation, route }) => {
         setModalVisible(!isModalVisible);
     };
 
+    const toggleAboutModal = () => {
+        setAboutModalVisible(!isAboutModalVisible);
+    }
     return (
 
         <View>
@@ -46,6 +51,10 @@ const ProfileScreen: React.FC<Props> = ({ navigation, route }) => {
                 <RoundedBox
                     image='https://i.pinimg.com/564x/a0/60/17/a06017e57bc5799e41380d162c6aabb7.jpg'
                     text={user?.phone} />
+                <TouchableOpacity onPress={toggleAboutModal}>
+                    <Text style={styles.aboutApp}>About the App  ℹ️ </Text>
+                </TouchableOpacity>    
+                <AboutApp isVisible={isAboutModalVisible} onClose={toggleAboutModal} />
                 <TouchableOpacity onPress={toggleModal}>
                     <Text style={styles.changePassword}>Change Password ?</Text>
                 </TouchableOpacity>
@@ -88,5 +97,12 @@ const styles = StyleSheet.create({
         color: 'red',
         marginTop: 24,
         fontFamily: 'PlusJakartaSans-ExtraBold',
+    },
+    aboutApp: {
+        fontSize: 16,
+        paddingHorizontal: 24,
+        marginTop: 24,
+        color: '#000000',
+        fontFamily: 'PlusJakartaSans-SemiBold'
     }
 })
