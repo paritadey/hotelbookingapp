@@ -21,10 +21,10 @@ const HotelItemScreen: React.FC<Props> = ({ route, navigation }) => {
   }
   console.log("outside attribute array: ", url);
   return (
-    <View style={{ flex: 1 }}>
-      {/* <Text>{hotel.name}</Text>
-    <Text>{hotel.formatted_address}</Text> */}
-      {/* <WebView 
+    <View style={styles.container}>
+       <Text style={styles.text}>{hotel.name}</Text>
+    <Text style={styles.subText}>{hotel.formatted_address}</Text> 
+       <WebView 
       source={{ uri: url }} 
       style={{width:'100%', height:'50%' }} 
       javaScriptEnabled={true} 
@@ -32,7 +32,7 @@ const HotelItemScreen: React.FC<Props> = ({ route, navigation }) => {
       startInLoadingState={true}
       scalesPageToFit={true} 
       
-    /> */}
+    /> 
     </View>
   )
 }
@@ -42,6 +42,23 @@ export default HotelItemScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
+    marginStart:24,
+    marginEnd:24,
+    marginBottom:24,
   },
+  text: {
+    marginTop: 24,
+    fontSize: 16,
+    paddingHorizontal: 24,
+    color: '#000000',
+    fontFamily: 'PlusJakartaSans-ExtraBold'
+  },
+  subText: {
+    width: '100%',
+    fontSize: 14,
+    color: '#000000',
+    paddingVertical: 8,
+    fontFamily: 'PlusJakartaSans-Italic-VariableFont_wght'
+  },
+
 })

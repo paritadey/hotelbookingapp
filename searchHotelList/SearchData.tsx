@@ -10,8 +10,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../AppNavigator'
 import { Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { fetchSearchHotelListRequest } from '../searchHotelList/action';
-import store, { RootState } from '../searchHotelList/store';
+import store from '../searchHotelList/store';
 import SearchList from './SearchList';
 import Icon from 'react-native-vector-icons/MaterialIcons'; 
 import IconFilter from 'react-native-vector-icons/FontAwesome'; // Import the desired icon set
@@ -50,6 +49,7 @@ const SearchData: React.FC<Props> = ({ locationName, navigation }) => {
   const [selectedCity, setSelectedCity] = useState<string | null>(null); // Holds the selected city
 
   const [showCard, setShowCard] = useState(false);
+  const [showText, setText] = useState(false);
 
   // State to store values of 5 TextInputs
   const [inputValues, setInputValues] = useState({
@@ -132,6 +132,7 @@ const SearchData: React.FC<Props> = ({ locationName, navigation }) => {
   }
 
   const selectCity = (city: string) => {
+    setText(true);
     setSelectedCity(city); // Sets the selected city
     setShowCities(false); // Hides the city list
   };
@@ -154,6 +155,7 @@ const SearchData: React.FC<Props> = ({ locationName, navigation }) => {
     // Hide the card
     setShowCard(false);
     setCondition(true);
+    setText(true);
   };
 
   // Update the text input values
@@ -204,6 +206,15 @@ const SearchData: React.FC<Props> = ({ locationName, navigation }) => {
   const handleBackPress = () => {
     navigation.goBack();
   }
+  const showPlaceHolderText = ()=>{
+    if(!showText){
+      return(
+        <View>
+          <Text style={styles.placeholder}>Please Click on filter to search hotels in your preferred location.</Text>
+        </View>
+      );
+    }
+  }
   return (
     <View>
       <View style={styles.header}>
@@ -221,6 +232,9 @@ const SearchData: React.FC<Props> = ({ locationName, navigation }) => {
         <TouchableOpacity onPress={handleChangeLocation}>
           <Text style={styles.textChange}>Change ?</Text>
         </TouchableOpacity>
+        <View>
+          {showPlaceHolderText()}
+        </View>
         {showCities && (
           <FlatList
             data={cities}
@@ -429,5 +443,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'PlusJakartaSans-BoldItalic',
   },
-
+  placeholder:{
+    width: Dimensions.get('window').width ,
+    fontSize: 14,
+    color: '#000000',
+    paddingHorizontal: 24,
+    marginTop:56,
+    fontFamily: 'PlusJakartaSans-Italic-VariableFont_wght',
+    alignItems:'center',
+    textAlign:'center',
+  }
 })

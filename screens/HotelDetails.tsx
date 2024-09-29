@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, Image, View, Dimensions, Alert, Text, Button, ImageBackground, ScrollView } from 'react-native'
+import { StyleSheet, TouchableOpacity, Image, View, Dimensions, Alert, Text, ImageBackground, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../AppNavigator'
@@ -6,12 +6,12 @@ import { ApiResponse, Data } from '../hotelDetails/type';
 import { fetchHotelDetails } from '../hotelDetails/apiService';
 import { DisplayData } from "../hotelDetails/DisplayData";
 import AddressModal from './AddressModal';
-import { database } from '../firebaseConfig'; 
+import { database } from '../firebaseConfig';
 import { ref, set } from 'firebase/database';
 import { CommonActions } from '@react-navigation/native';
 import { RootState } from '../authentication/store';
 import { useSelector } from 'react-redux';
-import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
 const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackParamList, 'HotelScreen'>) => {
@@ -24,23 +24,23 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
   const [isModalVisible, setModalVisible] = useState(false);
   let latitude: number;
   let longitude: number;
-  let time:number;
-  const toggleModal = async(latitude:number, longitude:number, hotelName:string, hotelAddress:string, summary:string, amenities:string[]) => {
+  let time: number;
+  const toggleModal = async (latitude: number, longitude: number, hotelName: string, hotelAddress: string, summary: string, amenities: string[]) => {
     setModalVisible(!isModalVisible);
-    if(isModalVisible){
+    if (isModalVisible) {
       console.log("recent search: ", latitude, longitude, hotelAddress, hotelName, hotelId, summary, amenities);
-      const userRef = ref(database, 'recentSearch/' +user?.name.replace(' ','').trim()+'/'+ "TraV_Search"+hotelId);
+      const userRef = ref(database, 'recentSearch/' + user?.name.replace(' ', '').trim() + '/' + "TraV_Search" + hotelId);
       await set(userRef, {
-        user: user?.name.replace(' ','').trim(),
-        hotelId:hotelId,
+        user: user?.name.replace(' ', '').trim(),
+        hotelId: hotelId,
         hotelName: hotelName,
         hotelAddress: hotelAddress,
         currencyCode: currencyCode,
         latitude: latitude,
         longitude: longitude,
         summary: summary,
-        amenities: amenities     
-      });  
+        amenities: amenities
+      });
     }
   };
   const user = useSelector((state: RootState) => state.auth.user);
@@ -82,13 +82,13 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
       string, longitude: number, latitude: number, summary: string, amenities: string[]) => {
     try {
       time = Date.now();
-      const userRef = ref(database, 'hotelBooking/' +user?.name.replace(' ','').trim()+'/'+ "TraV_"+time);
+      const userRef = ref(database, 'hotelBooking/' + user?.name.replace(' ', '').trim() + '/' + "TraV_" + time);
       showLocalNotification(hotelName, checkIn, checkOut);
       // Setting data in the database
       await set(userRef, {
-        user: user?.name.replace(' ','').trim(),
-        bookingId:"TraV_"+time,
-        timeStamp:Date.now(),
+        user: user?.name.replace(' ', '').trim(),
+        bookingId: "TraV_" + time,
+        timeStamp: Date.now(),
         hotelName: hotelName,
         hotelAddress: hotelAddress,
         checkIn: checkIn,
@@ -100,7 +100,7 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
         latitude: latitude,
         longitude: longitude,
         summary: summary,
-        amenities: amenities     
+        amenities: amenities
       });
 
       console.log("Data saved successfully!");
@@ -131,25 +131,30 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
       longitude = geoPoints[1];
 
       return (
-        <View style={styles.container}>
-          <View style={styles.blackSelection}>
-            <ImageBackground
-              source={{ uri: 'https://i.pinimg.com/736x/0c/a8/8d/0ca88d0c8b63a9d0589ab61211e36e6f.jpg' }}
-              style={styles.image}
-              resizeMode='cover'>
-              <View style={styles.header}>
-                <TouchableOpacity onPress={handleBackPress}>
-                <Icon name="arrow-back" size={24} color="#000" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>toggleModal(latitude, longitude, displayDataInstance.title, displayDataInstance.location.address,displayDataInstance.getSummary(),displayDataInstance.getAmenitiesList())}>
-                  <Text style={styles.text}>{displayDataInstance.title}</Text>
-                </TouchableOpacity>
-                <AddressModal isVisible={isModalVisible} latitude={latitude} longitude={longitude} hotelAddress={displayDataInstance.location.address} hotelName={displayDataInstance.title} 
-                onClose={()=>toggleModal(latitude, longitude, displayDataInstance.title, displayDataInstance.location.address,displayDataInstance.getSummary(),displayDataInstance.getAmenitiesList())} />
+        <ScrollView>
+          <View style={styles.container}>
+            <View style={styles.blackSelection}>
+              <ImageBackground
+                source={{ uri: 'https://i.pinimg.com/564x/d7/cd/e5/d7cde59fd45fa298763c24c1e6ad7f0b.jpg' }}
+                style={styles.background}
+                resizeMode='cover'>
+                <ImageBackground
+                source={{ uri: 'https://i.pinimg.com/736x/0c/a8/8d/0ca88d0c8b63a9d0589ab61211e36e6f.jpg' }}
+                style={styles.image}
+                resizeMode='cover'>
+              
+                <View style={styles.header}>
+                  <TouchableOpacity onPress={handleBackPress}>
+                    <Icon name="arrow-back" size={24} color="#000" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => toggleModal(latitude, longitude, displayDataInstance.title, displayDataInstance.location.address, displayDataInstance.getSummary(), displayDataInstance.getAmenitiesList())}>
+                    <Text style={styles.text}>{displayDataInstance.title}</Text>
+                  </TouchableOpacity>
+                  <AddressModal isVisible={isModalVisible} latitude={latitude} longitude={longitude} hotelAddress={displayDataInstance.location.address} hotelName={displayDataInstance.title}
+                    onClose={() => toggleModal(latitude, longitude, displayDataInstance.title, displayDataInstance.location.address, displayDataInstance.getSummary(), displayDataInstance.getAmenitiesList())} />
 
-              </View>
-              <View style={styles.card}>
-                <ScrollView>
+                </View>
+                <View style={styles.card}>
                   <Text style={styles.subText}> ★ {displayDataInstance.rankingDetails.replace('#', '').replace('<a>', '').replace('</a>', '')}</Text>
                   <Text style={styles.subText}> ℹ️ About Hotel: {displayDataInstance.getSummary()}</Text>
                   <Text style={styles.subText}> 🌐 Amenities: {displayDataInstance.getAmenitiesList()}</Text>
@@ -163,11 +168,12 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
                     displayDataInstance.getAmenitiesList())}>
                     <Text style={styles.buttonText}>Reserve</Text>
                   </TouchableOpacity>
-                </ScrollView>
-              </View>
-            </ImageBackground>
+                </View>
+                </ImageBackground>
+              </ImageBackground>
+            </View>
           </View>
-        </View>
+        </ScrollView>
       );
     }
   }
@@ -226,7 +232,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#ffffff',       // Background color for the card
     padding: 20,                   // Padding inside the card
-    marginVertical: Dimensions.get('window').height / 4,                   // Margin around the card
+    marginVertical: Dimensions.get('window').height / 6,                   // Margin around the card
     borderRadius: 15,              // Rounded corners
     // Shadow properties for iOS
     shadowColor: '#000',
@@ -243,7 +249,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height / 2,
+    height: Dimensions.get('window').height /2,
   },
   button: {
     backgroundColor: '#d49cd0', // Lavender color
@@ -279,5 +285,8 @@ const styles = StyleSheet.create({
     height: '80%',
     borderRadius: 10,
   },
-
+  background: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+  }
 })
