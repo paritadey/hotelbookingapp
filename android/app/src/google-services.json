@@ -1,13 +1,14 @@
 {
   "project_info": {
-    "project_number": "392712264095",
-    "project_id": "travelhope-709dc",
-    "storage_bucket": "travelhope-709dc.appspot.com"
+    "project_number": "318608894453",
+    "firebase_url": "https://travelstay-f58bd-default-rtdb.firebaseio.com",
+    "project_id": "travelstay-f58bd",
+    "storage_bucket": "travelstay-f58bd.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:392712264095:android:9070fe19ad86c6e6d145aa",
+        "mobilesdk_app_id": "1:318608894453:android:2de786d3b6cba57e31d8bc",
         "android_client_info": {
           "package_name": "com.hotelbookingapp"
         }
@@ -15,7 +16,26 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD2Jtds_sk67ekQD14J4Bd372FAIBct_uo"
+          "current_key": "AIzaSyAuTMOZu_7orJduncdr4YGBpV_Q2aU65A0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:318608894453:android:0a09542e76e9641331d8bc",
+        "android_client_info": {
+          "package_name": "com.reactproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuTMOZu_7orJduncdr4YGBpV_Q2aU65A0"
         }
       ],
       "services": {
