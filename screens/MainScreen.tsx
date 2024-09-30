@@ -26,6 +26,7 @@ export type RecentSearch = {
   latitude: number;
   longitude: number;
   summary: string;
+  price:string;
   amenities: string[];
 
 }
@@ -220,10 +221,15 @@ const MainScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   }
 
+  const handleRecentSearchItem = (searchItem:RecentSearch)=>{
+    navigation.navigate('RecentSearch', { searchItem });
+  }
   const UserSearchItem: React.FC<{ search: RecentSearch }> = ({ search }) => (
     <View>
       <View style={[styles.cardItem, styles.cardItemElevated]}>
-        <Image source={{ uri: 'https://i.pinimg.com/564x/c1/a6/93/c1a693d453eb0c6d4f0efea500dcc1f8.jpg' }} style={styles.cardItemImage} />
+        <TouchableOpacity onPress={()=>handleRecentSearchItem(search)}>
+          <Image source={{ uri: 'https://i.pinimg.com/564x/c1/a6/93/c1a693d453eb0c6d4f0efea500dcc1f8.jpg' }} style={styles.cardItemImage} />
+        </TouchableOpacity>
         <View style={styles.cardItemBody}>
           <Text style={styles.cardItemTitle}>{search.hotelName}</Text>
         </View>

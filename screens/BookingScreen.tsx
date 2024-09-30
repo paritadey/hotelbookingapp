@@ -1,20 +1,21 @@
 import { StyleSheet, Text, View, ActivityIndicator, FlatList, Image, TouchableOpacity } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { database } from '../firebaseConfig'; // adjust the path as needed
-import { ref, onValue } from 'firebase/database';
+import { ref, onValue, query, orderByChild } from 'firebase/database';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../AppNavigator'
 import { RootState } from '../authentication/store';
 import { useSelector } from 'react-redux';
 
 export type BookingList = {
-  user:string;
-  bookingId:string;
+  user: string;
+  bookingId: string;
   hotelName: string;
   hotelAddress: string;
   checkIn: string;
   checkOut: string;
   currencyCode: string;
+  oneNightPrice: string;
   price: string;
   roomsToBook: string;
   adults: string;
@@ -22,19 +23,24 @@ export type BookingList = {
   longitude: number;
   summary: string;
   amenities: string[];
-  timeStamp:string;
+  timeStamp: string;
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Booking'>;
 
-const BookingScreen :React.FC<Props> = ({ navigation, route }) => {
+const BookingScreen: React.FC<Props> = ({ navigation, route }) => {
   const [data, setData] = useState<BookingList[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const user = useSelector((state: RootState) => state.auth.user);
   console.log("User data:", user?.email);
 
   useEffect(() => {
-    const dataRef = ref(database, 'hotelBooking/'+user?.name.replace(' ', '').trim());
+    // const dataRef = ref(database, 'hotelBooking/'+user?.name.replace(' ', '').trim());
+    const dataRef = query(
+      ref(database, 'hotelBooking/' + user?.name.replace(' ', '').trim()),
+      orderByChild('timeStamp') // Sort by 'checkIn' date
+    );
+
     // Set up a listener for changes in the data at this reference
     const unsubscribe = onValue(dataRef, (snapshot) => {
       const data: Record<string, BookingList> = snapshot.val() || [];
@@ -42,7 +48,7 @@ const BookingScreen :React.FC<Props> = ({ navigation, route }) => {
         id: key,
         ...data[key],
       }))
-      setData(bookingList);
+      setData(bookingList.reverse());// Reverse the list to get descending order
       setLoading(false);
     });
 
@@ -57,26 +63,26 @@ const BookingScreen :React.FC<Props> = ({ navigation, route }) => {
       </View>
     );
   }
-  const handleBookedHotelClick=(booking:BookingList)=>{
+  const handleBookedHotelClick = (booking: BookingList) => {
     console.log("Booked hotel details:", booking);
-    navigation.navigate("BookedHotel", {booking})
+    navigation.navigate("BookedHotel", { booking })
   }
   const UserItem: React.FC<{ booking: BookingList }> = ({ booking }) => (
     <View>
-      <View style={styles.itemContainer}>
-        <TouchableOpacity onPress={()=>handleBookedHotelClick(booking)}>
-        <Image source={{ uri: 'https://i.pinimg.com/564x/80/0a/f0/800af0101b474de67b3d36ea7cac4711.jpg' }} style={styles.image} />
-        </TouchableOpacity>
-        <View style={styles.textContainer}>
-          <Text style={styles.subtitle}>Your Booking is confirmed with {booking.hotelName}</Text>
-          <Text style={styles.subText}>for price: {booking.price}</Text>
-          <View style={styles.dateContainer}>
-          <Text style={styles.checkIn}>Check-In {"\n"} {booking.checkIn}</Text>
-          <Text style={styles.checkOut}>Check-Out {"\n"} {booking.checkOut}</Text>
+      <TouchableOpacity onPress={() => handleBookedHotelClick(booking)} style={styles.touchable}>
+        <View style={styles.itemContainer}>
+          <Image source={{ uri: 'https://i.pinimg.com/564x/80/0a/f0/800af0101b474de67b3d36ea7cac4711.jpg' }} style={styles.image} />
+          <View style={styles.textContainer}>
+            <Text style={styles.subtitle}>Your Booking is confirmed with {booking.hotelName}</Text>
+            <Text style={styles.subText}>Amount paid: ₹ {booking.price}</Text>
+            <View style={styles.dateContainer}>
+              <Text style={styles.checkIn}>Check-In {"\n"} {booking.checkIn}</Text>
+              <Text style={styles.checkOut}>Check-Out {"\n"} {booking.checkOut}</Text>
+            </View>
+          </View>
         </View>
+      </TouchableOpacity>
 
-        </View>
-      </View>
     </View>
   );
 
@@ -173,5 +179,9 @@ const styles = StyleSheet.create({
     fontFamily: 'PlusJakartaSans-SemiBold',
     textAlign: 'right', // Align the check-out text to the right
   },
-
+  touchable: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 })
