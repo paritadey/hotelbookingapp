@@ -56,7 +56,8 @@ const BookedHotelDetails: React.FC<Props> = ({ navigation, route }) => {
                   <Text style={styles.subText}> 🛏️ Number of Rooms: {booking.roomsToBook}</Text>
                   <Text style={styles.subText}> 👤 Number of Person: {booking.adults}</Text>
                   <Text style={styles.subTextL2}> 📍 Address: {booking.hotelAddress}</Text>
-                  <Text style={styles.subTextL1}>Amount paid: {booking.price} 💰</Text>
+                  <Text style={styles.subText}> Per Night Hotel Price : {booking.oneNightPrice}</Text>
+                  <Text style={styles.subTextL1}>Amount paid: ₹ {booking.price} 💰</Text>
                   <TouchableOpacity style={[styles.button]} onPress={handleCancelReservation}>
                     <Text style={styles.buttonText}>Cancel Reservation</Text>
                   </TouchableOpacity>

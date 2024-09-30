@@ -15,6 +15,7 @@ export type BookingList = {
   checkIn: string;
   checkOut: string;
   currencyCode: string;
+  oneNightPrice:string;
   price: string;
   roomsToBook: string;
   adults: string;
@@ -69,7 +70,7 @@ const BookingScreen :React.FC<Props> = ({ navigation, route }) => {
         </TouchableOpacity>
         <View style={styles.textContainer}>
           <Text style={styles.subtitle}>Your Booking is confirmed with {booking.hotelName}</Text>
-          <Text style={styles.subText}>for price: {booking.price}</Text>
+          <Text style={styles.subText}>Amount paid: ₹ {booking.price}</Text>
           <View style={styles.dateContainer}>
           <Text style={styles.checkIn}>Check-In {"\n"} {booking.checkIn}</Text>
           <Text style={styles.checkOut}>Check-Out {"\n"} {booking.checkOut}</Text>
