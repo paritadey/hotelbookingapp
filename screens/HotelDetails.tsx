@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, Image, View, Dimensions, Alert, Text, ImageBackground, ScrollView } from 'react-native'
+import { StyleSheet, TouchableOpacity, Image, View, Dimensions, Alert, Text, ImageBackground, ScrollView, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../AppNavigator'
@@ -22,15 +22,16 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
   const [error, setError] = useState<string | null>(null);
   let displayDataInstance: DisplayData;
   const [isModalVisible, setModalVisible] = useState(false);
-  const [daysDifference, setDaysDifference] = useState<number | null>(null);
+  const [loadingScreen, setScreenLoading] = useState<boolean>(true);
+
   let latitude: number;
   let longitude: number;
   let time: number;
   const toggleModal = async (latitude: number, longitude: number, hotelName: string, hotelAddress: string, summary: string, amenities: string[], priceForDisplay:string) => {
     setModalVisible(!isModalVisible);
-    console.log("Price for display: ", priceForDisplay);
+    //console.log("Price for display: ", priceForDisplay);
     if (isModalVisible) {
-      console.log("recent search: ", latitude, longitude, hotelAddress, hotelName, hotelId, summary, amenities);
+      //console.log("recent search: ", latitude, longitude, hotelAddress, hotelName, hotelId, summary, amenities);
       const userRef = ref(database, 'recentSearch/' + user?.name.replace(' ', '').trim() + '/' + "TraV_Search" + hotelId);
       await set(userRef, {
         user: user?.name.replace(' ', '').trim(),
@@ -138,6 +139,23 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
       return 1;  // Return null if dates are invalid
     }
   };
+  useEffect(() => {
+    // Set a timeout to hide the loader after 2 seconds (2000 ms)
+    const timer = setTimeout(() => {
+      setScreenLoading(false);
+    }, 2000);
+
+    // Cleanup the timeout if the component is unmounted before 2 seconds
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
 
   const displayHotel = () => {
@@ -309,5 +327,10 @@ const styles = StyleSheet.create({
   background: {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
-  }
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 })
