@@ -26,6 +26,7 @@ export type RecentSearch = {
   latitude: number;
   longitude: number;
   summary: string;
+  price:string;
   amenities: string[];
 
 }

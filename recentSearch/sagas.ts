@@ -24,7 +24,7 @@ function* fetchSearch(action: FetchHotelRSRequestAction) {
 
     try {
         const response: AxiosResponse<Data> = yield call(axios.request, options);
-      //  console.log("Data we found from search hotel for recent search:", response.data);
+        console.log("Data we found from search hotel for recent search in saga:", response.data);
         yield put(fetchHotelRSSuccess(response.data));
     } catch (error: any) {
         yield put(fetchHotelRSFailure(error.message));

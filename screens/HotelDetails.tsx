@@ -22,11 +22,13 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
   const [error, setError] = useState<string | null>(null);
   let displayDataInstance: DisplayData;
   const [isModalVisible, setModalVisible] = useState(false);
+  const [daysDifference, setDaysDifference] = useState<number | null>(null);
   let latitude: number;
   let longitude: number;
   let time: number;
-  const toggleModal = async (latitude: number, longitude: number, hotelName: string, hotelAddress: string, summary: string, amenities: string[]) => {
+  const toggleModal = async (latitude: number, longitude: number, hotelName: string, hotelAddress: string, summary: string, amenities: string[], priceForDisplay:string) => {
     setModalVisible(!isModalVisible);
+    console.log("Price for display: ", priceForDisplay);
     if (isModalVisible) {
       console.log("recent search: ", latitude, longitude, hotelAddress, hotelName, hotelId, summary, amenities);
       const userRef = ref(database, 'recentSearch/' + user?.name.replace(' ', '').trim() + '/' + "TraV_Search" + hotelId);
@@ -38,6 +40,7 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
         currencyCode: currencyCode,
         latitude: latitude,
         longitude: longitude,
+        price:priceForDisplay,
         summary: summary,
         amenities: amenities
       });
@@ -78,7 +81,7 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
   }
 
   const handleReserve = async (hotelName: string, hotelAddress: string, checkIn: string,
-    checkOut: string, currencyCode: string, priceForDisplay: string, rooms: string, adults:
+    checkOut: string, currencyCode: string, priceForDisplay: string, totalPay:string, rooms: string, adults:
       string, longitude: number, latitude: number, summary: string, amenities: string[]) => {
     try {
       time = Date.now();
@@ -94,7 +97,8 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
         checkIn: checkIn,
         checkOut: checkOut,
         currencyCode: currencyCode,
-        price: priceForDisplay,
+        oneNightPrice:priceForDisplay,
+        price: totalPay,
         roomsToBook: rooms,
         adults: adults,
         latitude: latitude,
@@ -122,6 +126,20 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
 
   //  console.log("Hotel Details:", data);
 
+  const calculateDaysBetween = (date1: string, date2: string): number | null => {
+    const firstDate = new Date(date1);
+    const secondDate = new Date(date2);
+    // Ensure both dates are valid
+    if (!isNaN(firstDate.getTime()) && !isNaN(secondDate.getTime())) {
+      const timeDifference = secondDate.getTime() - firstDate.getTime();
+      const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+      return Math.ceil(daysDifference);  // Return the calculated days
+    } else {
+      return 1;  // Return null if dates are invalid
+    }
+  };
+
+
   const displayHotel = () => {
     if (data != null) {
       displayDataInstance = new DisplayData(data);
@@ -129,7 +147,9 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
       const geoPoints = displayDataInstance.getGeoCode()
       latitude = geoPoints[0];
       longitude = geoPoints[1];
-
+      const result = calculateDaysBetween(checkIn, checkOut)|| 0;
+      //console.log("Payment:", checkIn, checkOut, result, parseInt(priceForDisplay.replace("₹", '').replace(",", '')), parseInt(rooms), parseInt("1"))
+      const totalPay = parseInt(priceForDisplay.replace("₹", '').replace(",", '')) * parseInt(rooms) * result;
       return (
         <ScrollView>
           <View style={styles.container}>
@@ -147,11 +167,11 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
                   <TouchableOpacity onPress={handleBackPress}>
                     <Icon name="arrow-back" size={24} color="#000" />
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => toggleModal(latitude, longitude, displayDataInstance.title, displayDataInstance.location.address, displayDataInstance.getSummary(), displayDataInstance.getAmenitiesList())}>
+                  <TouchableOpacity onPress={() => toggleModal(latitude, longitude, displayDataInstance.title, displayDataInstance.location.address, displayDataInstance.getSummary(), displayDataInstance.getAmenitiesList(), priceForDisplay)}>
                     <Text style={styles.text}>{displayDataInstance.title}</Text>
                   </TouchableOpacity>
                   <AddressModal isVisible={isModalVisible} latitude={latitude} longitude={longitude} hotelAddress={displayDataInstance.location.address} hotelName={displayDataInstance.title}
-                    onClose={() => toggleModal(latitude, longitude, displayDataInstance.title, displayDataInstance.location.address, displayDataInstance.getSummary(), displayDataInstance.getAmenitiesList())} />
+                    onClose={() => toggleModal(latitude, longitude, displayDataInstance.title, displayDataInstance.location.address, displayDataInstance.getSummary(), displayDataInstance.getAmenitiesList(), priceForDisplay)} />
 
                 </View>
                 <View style={styles.card}>
@@ -163,8 +183,9 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
                   <Text style={styles.subText}> 👤 Number of Person: {adults}</Text>
                   <Text style={styles.subText}>{priceDetails} ⏰</Text>
                   <Text style={styles.subTextL2}> 📍 Address: {displayDataInstance.location.address}</Text>
-                  <Text style={styles.subTextL1}>Amount to pay: {priceForDisplay} 💰</Text>
-                  <TouchableOpacity style={[styles.button]} onPress={() => handleReserve(displayDataInstance.title, displayDataInstance.location.address, checkIn, checkOut, currencyCode, priceForDisplay, rooms, adults, longitude, latitude, displayDataInstance.getSummary(),
+                  <Text style={styles.subTextL1}>Amount (per night and per room): {priceForDisplay} 💰</Text>
+                  <Text style={styles.subTextL1}>Total Amount to Pay:₹ {totalPay} 💰</Text>
+                  <TouchableOpacity style={[styles.button]} onPress={() => handleReserve(displayDataInstance.title, displayDataInstance.location.address, checkIn, checkOut, currencyCode, priceForDisplay,totalPay.toString(), rooms, adults, longitude, latitude, displayDataInstance.getSummary(),
                     displayDataInstance.getAmenitiesList())}>
                     <Text style={styles.buttonText}>Reserve</Text>
                   </TouchableOpacity>
