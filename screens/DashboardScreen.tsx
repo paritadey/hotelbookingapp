@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Alert } from 'react-native'
+import { StyleSheet, Alert } from 'react-native'
 import React, { useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons'; // Import icon library

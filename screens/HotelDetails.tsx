@@ -82,9 +82,32 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
     navigation.goBack();
   }
 
-  const handleReserve = async (hotelName: string, hotelAddress: string, checkIn: string,
+  const handleReserve = (hotelName: string, hotelAddress: string, checkIn: string,
     checkOut: string, currencyCode: string, priceForDisplay: string, totalPay: string, rooms: string, adults:
       string, longitude: number, latitude: number, summary: string, amenities: string[]) => {
+    Alert.alert(
+      "Reservation confirmation",             
+      "Do you want to reserve the hotel?", 
+      [
+        {
+          text: "No",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"          
+        },
+        {
+          text: "Yes",
+          onPress: () =>{ 
+            updateDatabase(hotelName, hotelAddress, checkIn, checkOut, currencyCode, priceForDisplay, totalPay, rooms,adults,longitude, latitude, summary, amenities)
+          }
+        }
+      ],
+      { cancelable: false }        // Whether the alert can be dismissed by tapping outside
+    );
+  }
+
+  const updateDatabase= async(hotelName: string, hotelAddress: string, checkIn: string,
+    checkOut: string, currencyCode: string, priceForDisplay: string, totalPay: string, rooms: string, adults:
+      string, longitude: number, latitude: number, summary: string, amenities: string[])=>{
     try {
       time = Date.now();
       const userRef = ref(database, 'hotelBooking/' + user?.name.replace(' ', '').trim() + '/' + "TraV_" + time);

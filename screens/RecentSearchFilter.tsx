@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Dimensions, ScrollView, Alert } from 'react-native';
-import IconFilter from 'react-native-vector-icons/FontAwesome'; // Import the desired icon set
+import { View, TextInput, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Dimensions, ScrollView, Alert } from 'react-native';
+import IconFilter from 'react-native-vector-icons/FontAwesome'; 
 import { Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useSelector, useDispatch, } from 'react-redux';
@@ -25,7 +25,6 @@ const RecentSearchFilter: React.FC<RecentSearchFilterProp> = ({ searchItem, back
     const dispatchHotel = useDispatch();
     const [isModalVisible, setModalVisible] = useState(false);
     const [showCard, setShowCard] = useState(false);
-    const [show, setShow] = useState(false);
     const searchData = useSelector((state: NearByHotelState) => state.dataItem);
     const loading = useSelector((state: NearByHotelState) => state.loading);
     let time: number;
@@ -133,7 +132,26 @@ const RecentSearchFilter: React.FC<RecentSearchFilterProp> = ({ searchItem, back
         }
     };
 
-    const handleReserve = async (totalPay: string) => {
+    const handleReserve = (totalPay: string) => {
+        Alert.alert(
+            "Reservation confirmation",              
+            "Do you want to reserve the hotel?", 
+            [
+              {
+                text: "No",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"         
+              },
+              {
+                text: "Yes",
+                onPress: () => updateDatabase(totalPay)
+              }
+            ],
+            { cancelable: false }  
+          );
+    }
+
+    const updateDatabase = async(totalPay: string) =>{
         if (!isNaN(parseInt(totalPay))) {
             try {
                 time = Date.now();
