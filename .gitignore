@@ -76,3 +76,7 @@ yarn-error.log
 # Google MAP Key
 #
 utils/
+assets/serviceAccountKey.json
+
+firebase.json
+.firebaserc

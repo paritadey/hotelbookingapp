@@ -1,11 +1,13 @@
-import { StyleSheet, TouchableOpacity, Image, ImageBackground, View, Text, Dimensions, ScrollView } from 'react-native'
-import React, {useState} from 'react'
+import { StyleSheet, TouchableOpacity, Alert, ImageBackground, View, Text, Dimensions, ScrollView } from 'react-native'
+import React, { useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../AppNavigator'
 import AddressModal from './AddressModal';
 import { ref, remove } from 'firebase/database';
-import { database } from '../firebaseConfig'; 
-import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import { database } from '../firebaseConfig';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import Notifications from '../notification/Notifications'
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BookedHotel'>;
 
@@ -14,24 +16,50 @@ const BookedHotelDetails: React.FC<Props> = ({ navigation, route }) => {
   console.log("The booking order details :", booking);
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const handleBackPress= ()=>{
+  const handleBackPress = () => {
     navigation.goBack();
   }
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
-  const handleCancelReservation =async() => {
+  const handleCancelReservation = () => {
+    Alert.alert(
+      "Cancelation",
+      "Do you want to cancel the booking ?",
+      [
+        {
+          text: "No",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "Yes",
+          onPress: () => updateDatabase()
+        }
+      ],
+      { cancelable: false }   
+    );
+
+  }
+
+  const updateDatabase = async () => {
     try {
-      const userRef = ref(database, '/hotelBooking/'+booking.user+'/'+booking.bookingId); // Use the `ref` function with the database and path
+      const userRef = ref(database, '/hotelBooking/' + booking.user + '/' + booking.bookingId); // Use the `ref` function with the database and path
       // Remove the data
       await remove(userRef);
       console.log('Data deleted successfully.');
     } catch (error) {
       console.error('Error deleting data:', error);
     }
+    showLocalCancelBookingNotification(booking.hotelName, booking.bookingId);
     navigation.goBack();
   }
 
+  const showLocalCancelBookingNotification = async (hotelName: string, bookingId: string) => {
+    console.log("Inside showLocalCancelBookingNotification");
+    const reminderDate = new Date(Date.now() + 2 * 1000); // Schedule for 2 seconds from now
+    Notifications.scheduleCancelNotification(reminderDate, hotelName, bookingId);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.blackSelection}>
@@ -41,7 +69,7 @@ const BookedHotelDetails: React.FC<Props> = ({ navigation, route }) => {
           resizeMode='cover'>
           <View style={styles.header}>
             <TouchableOpacity onPress={handleBackPress}>
-            <Icon name="arrow-back" size={24} color="#000" />
+              <Icon name="arrow-back" size={24} color="#000" />
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleModal}>
               <Text style={styles.text}>{booking.hotelName}</Text>
@@ -49,20 +77,20 @@ const BookedHotelDetails: React.FC<Props> = ({ navigation, route }) => {
             <AddressModal isVisible={isModalVisible} latitude={booking.latitude} longitude={booking.longitude} hotelAddress={booking.hotelAddress} hotelName={booking.hotelName} onClose={toggleModal} />
           </View>
           <View style={styles.card}>
-                <ScrollView>
-                  <Text style={styles.subText}> ℹ️ About Hotel: {booking.summary}</Text>
-                  <Text style={styles.subText}> 🌐 Amenities: {booking.amenities}</Text>
-                  <Text style={styles.subText}> ✔️ Booked from: {booking.checkIn} to {booking.checkOut}</Text>
-                  <Text style={styles.subText}> 🛏️ Number of Rooms: {booking.roomsToBook}</Text>
-                  <Text style={styles.subText}> 👤 Number of Person: {booking.adults}</Text>
-                  <Text style={styles.subTextL2}> 📍 Address: {booking.hotelAddress}</Text>
-                  <Text style={styles.subText}> Per Night Hotel Price : {booking.oneNightPrice}</Text>
-                  <Text style={styles.subTextL1}>Amount paid: ₹ {booking.price} 💰</Text>
-                  <TouchableOpacity style={[styles.button]} onPress={handleCancelReservation}>
-                    <Text style={styles.buttonText}>Cancel Reservation</Text>
-                  </TouchableOpacity>
-                </ScrollView>
-              </View>
+            <ScrollView>
+              <Text style={styles.subText}> ℹ️ About Hotel: {booking.summary}</Text>
+              <Text style={styles.subText}> 🌐 Amenities: {booking.amenities}</Text>
+              <Text style={styles.subText}> ✔️ Booked from: {booking.checkIn} to {booking.checkOut}</Text>
+              <Text style={styles.subText}> 🛏️ Number of Rooms: {booking.roomsToBook}</Text>
+              <Text style={styles.subText}> 👤 Number of Person: {booking.adults}</Text>
+              <Text style={styles.subTextL2}> 📍 Address: {booking.hotelAddress}</Text>
+              <Text style={styles.subText}> Per Night Hotel Price : {booking.oneNightPrice}</Text>
+              <Text style={styles.subTextL1}>Amount paid: ₹ {booking.price} 💰</Text>
+              <TouchableOpacity style={[styles.button]} onPress={handleCancelReservation}>
+                <Text style={styles.buttonText}>Cancel Reservation</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
         </ImageBackground>
       </View>
     </View>

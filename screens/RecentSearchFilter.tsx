@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Dimensions, ScrollView, Alert } from 'react-native';
-import IconFilter from 'react-native-vector-icons/FontAwesome'; // Import the desired icon set
+import { View, TextInput, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Dimensions, ScrollView, Alert } from 'react-native';
+import IconFilter from 'react-native-vector-icons/FontAwesome'; 
 import { Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useSelector, useDispatch, } from 'react-redux';
@@ -13,6 +13,7 @@ import ImageCard from '../components/ImageCard';
 import { database } from '../firebaseConfig';
 import { ref, set } from 'firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Notifications from '../notification/Notifications'
 
 interface RecentSearchFilterProp {
     searchItem: RecentSearch;
@@ -24,7 +25,6 @@ const RecentSearchFilter: React.FC<RecentSearchFilterProp> = ({ searchItem, back
     const dispatchHotel = useDispatch();
     const [isModalVisible, setModalVisible] = useState(false);
     const [showCard, setShowCard] = useState(false);
-    const [show, setShow] = useState(false);
     const searchData = useSelector((state: NearByHotelState) => state.dataItem);
     const loading = useSelector((state: NearByHotelState) => state.loading);
     let time: number;
@@ -132,24 +132,44 @@ const RecentSearchFilter: React.FC<RecentSearchFilterProp> = ({ searchItem, back
         }
     };
 
-    const handleReserve = async (totalPay: string) => {
+    const handleReserve = (totalPay: string) => {
+        Alert.alert(
+            "Reservation confirmation",              
+            "Do you want to reserve the hotel?", 
+            [
+              {
+                text: "No",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"         
+              },
+              {
+                text: "Yes",
+                onPress: () => updateDatabase(totalPay)
+              }
+            ],
+            { cancelable: false }  
+          );
+    }
+
+    const updateDatabase = async(totalPay: string) =>{
         if (!isNaN(parseInt(totalPay))) {
             try {
                 time = Date.now();
                 const userData = await AsyncStorage.getItem('user');
                 const jsonData = userData != null ? JSON.parse(userData) : null;
                 console.log("User Data in RecentSearch screen: ", jsonData.name);
+                const bookingId = "TraV_" + time;
 
                 const userRef = ref(database, 'hotelBooking/' + jsonData?.name.replace(' ', '').trim() + '/' + "TraV_" + time);
                 // Setting data in the database
                 await set(userRef, {
                     user: jsonData?.name.replace(' ', '').trim(),
-                    bookingId: "TraV_" + time,
-                    timeStamp: Date.now(),
+                    bookingId: bookingId,
+                    timeStamp: time,
                     hotelName: searchItem.hotelName,
                     hotelAddress: searchItem.hotelAddress,
-                    checkIn: inputValues.checkIn,
-                    checkOut: inputValues.checkOut,
+                    checkIn: convertDateFormat(inputValues.checkIn),
+                    checkOut: convertDateFormat(inputValues.checkOut),
                     currencyCode: inputValues.currencyCode,
                     oneNightPrice: searchItem.price,
                     price: totalPay,
@@ -161,6 +181,10 @@ const RecentSearchFilter: React.FC<RecentSearchFilterProp> = ({ searchItem, back
                     amenities: searchItem.amenities
                 });
                 console.log("Data saved successfully!");
+                console.log("Data saved successfully!");
+                if (jsonData?.name != null) {
+                  showLocalNotification(searchItem.hotelName, inputValues.checkIn, inputValues.checkOut, jsonData?.name.replace(' ', '').trim(), bookingId);
+                }          
                 reserveClick();
             } catch (error) {
                 console.error('Error storing data: ', error);
@@ -170,6 +194,12 @@ const RecentSearchFilter: React.FC<RecentSearchFilterProp> = ({ searchItem, back
             console.log("Data is invalid");
         }
     }
+
+    const showLocalNotification = async (hotelName: string, checkIn: string, checkOut: string, userId: string, bookingId: string) => {
+        console.log("Inside showLocalNotification");
+        const reminderDate = new Date(Date.now() + 2 * 1000); // Schedule for 2 seconds from now
+        Notifications.scheduleNotification(reminderDate, checkIn, checkOut, bookingId, hotelName);
+    };
     const showHotelDetails = () => {
         const result = calculateDaysBetween(inputValues.checkIn, inputValues.checkOut) || 0;
         const totalPay = parseInt(searchItem.price.replace("₹", '').replace(",", '')) * parseInt(inputValues.roomNumber) * result;
