@@ -6,6 +6,8 @@ import AddressModal from './AddressModal';
 import { ref, remove } from 'firebase/database';
 import { database } from '../firebaseConfig'; 
 import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import Notifications from '../notification/Notifications'
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BookedHotel'>;
 
@@ -29,9 +31,15 @@ const BookedHotelDetails: React.FC<Props> = ({ navigation, route }) => {
     } catch (error) {
       console.error('Error deleting data:', error);
     }
+    showLocalCancelBookingNotification(booking.hotelName, booking.bookingId);
     navigation.goBack();
   }
 
+  const showLocalCancelBookingNotification = async (hotelName: string, bookingId: string) => {
+    console.log("Inside showLocalCancelBookingNotification");
+    const reminderDate = new Date(Date.now() + 2 * 1000); // Schedule for 2 seconds from now
+    Notifications.scheduleCancelNotification(reminderDate, hotelName, bookingId);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.blackSelection}>

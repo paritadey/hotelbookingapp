@@ -33,6 +33,7 @@ class Notifications {
     PushNotification.getScheduledLocalNotifications(rn => {
       console.log('SN --- ', rn);
     });
+
   }
 
   scheduleNotification(date:Date, checkIn:string, checkOut:string, bookingId:string, hotelName:string) {
@@ -44,6 +45,17 @@ class Notifications {
       date,
       repeatTime:4,
     });
+  }
+  scheduleCancelNotification(date:Date, bookingId:string, hotelName:string){
+    console.log("Inside schedule cancel notification");
+    PushNotification.localNotificationSchedule({
+      channelId: 'reminders',
+      title: '📡 It seems that you have canceled your booking of '+ hotelName +'of booking id: '+bookingId,
+      message: 'Check your Booking list.',
+      date,
+      repeatTime:4,
+    });
+
   }
 }
 
