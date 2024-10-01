@@ -13,6 +13,7 @@ import ImageCard from '../components/ImageCard';
 import { database } from '../firebaseConfig';
 import { ref, set } from 'firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Notifications from '../notification/Notifications'
 
 interface RecentSearchFilterProp {
     searchItem: RecentSearch;
@@ -139,13 +140,14 @@ const RecentSearchFilter: React.FC<RecentSearchFilterProp> = ({ searchItem, back
                 const userData = await AsyncStorage.getItem('user');
                 const jsonData = userData != null ? JSON.parse(userData) : null;
                 console.log("User Data in RecentSearch screen: ", jsonData.name);
+                const bookingId = "TraV_" + time;
 
                 const userRef = ref(database, 'hotelBooking/' + jsonData?.name.replace(' ', '').trim() + '/' + "TraV_" + time);
                 // Setting data in the database
                 await set(userRef, {
                     user: jsonData?.name.replace(' ', '').trim(),
-                    bookingId: "TraV_" + time,
-                    timeStamp: Date.now(),
+                    bookingId: bookingId,
+                    timeStamp: time,
                     hotelName: searchItem.hotelName,
                     hotelAddress: searchItem.hotelAddress,
                     checkIn: convertDateFormat(inputValues.checkIn),
@@ -161,6 +163,10 @@ const RecentSearchFilter: React.FC<RecentSearchFilterProp> = ({ searchItem, back
                     amenities: searchItem.amenities
                 });
                 console.log("Data saved successfully!");
+                console.log("Data saved successfully!");
+                if (jsonData?.name != null) {
+                  showLocalNotification(searchItem.hotelName, inputValues.checkIn, inputValues.checkOut, jsonData?.name.replace(' ', '').trim(), bookingId);
+                }          
                 reserveClick();
             } catch (error) {
                 console.error('Error storing data: ', error);
@@ -170,6 +176,12 @@ const RecentSearchFilter: React.FC<RecentSearchFilterProp> = ({ searchItem, back
             console.log("Data is invalid");
         }
     }
+
+    const showLocalNotification = async (hotelName: string, checkIn: string, checkOut: string, userId: string, bookingId: string) => {
+        console.log("Inside showLocalNotification");
+        const reminderDate = new Date(Date.now() + 2 * 1000); // Schedule for 2 seconds from now
+        Notifications.scheduleNotification(reminderDate, checkIn, checkOut, bookingId, hotelName);
+    };
     const showHotelDetails = () => {
         const result = calculateDaysBetween(inputValues.checkIn, inputValues.checkOut) || 0;
         const totalPay = parseInt(searchItem.price.replace("₹", '').replace(",", '')) * parseInt(inputValues.roomNumber) * result;

@@ -41,7 +41,7 @@ function buildDeepLinkFromNotificationData(data:any): string | null {
   const navigationId = data?.navigationId;
   console.log("navigation id :", navigationId);
   if (!NAVIGATION_IDS.includes(navigationId)) {
-    console.warn('Unverified navigationId', navigationId)
+    console.log('Unverified navigationId', navigationId)
     return null;
   }
   if (navigationId === 'Main') {
