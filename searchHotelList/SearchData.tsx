@@ -222,7 +222,7 @@ const SearchData: React.FC<Props> = ({ locationName, navigation }) => {
         <Icon name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <TouchableOpacity onPress={fetchChangedCityLOCData}>
-          <Text style={styles.text}>{selectedCity ? `You are in : ${selectedCity}` : `You are in : ${locationName}`}</Text>
+          <Text style={styles.text}>{selectedCity ? `You are in : ${selectedCity}` : `You are in : ${locationName}`} ↻</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={toggleCard}>
         <IconFilter name="filter" size={24} color="#000" />

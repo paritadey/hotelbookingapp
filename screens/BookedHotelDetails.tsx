@@ -72,7 +72,7 @@ const BookedHotelDetails: React.FC<Props> = ({ navigation, route }) => {
               <Icon name="arrow-back" size={24} color="#000" />
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleModal}>
-              <Text style={styles.text}>{booking.hotelName}</Text>
+              <Text style={styles.text}>{booking.hotelName}  🗺️</Text>
             </TouchableOpacity>
             <AddressModal isVisible={isModalVisible} latitude={booking.latitude} longitude={booking.longitude} hotelAddress={booking.hotelAddress} hotelName={booking.hotelName} onClose={toggleModal} />
           </View>
@@ -84,8 +84,8 @@ const BookedHotelDetails: React.FC<Props> = ({ navigation, route }) => {
               <Text style={styles.subText}> 🛏️ Number of Rooms: {booking.roomsToBook}</Text>
               <Text style={styles.subText}> 👤 Number of Person: {booking.adults}</Text>
               <Text style={styles.subTextL2}> 📍 Address: {booking.hotelAddress}</Text>
-              <Text style={styles.subText}> Per Night Hotel Price : {booking.oneNightPrice}</Text>
-              <Text style={styles.subTextL1}>Amount paid: ₹ {booking.price} 💰</Text>
+              <Text style={styles.subText}> Per Night Hotel Price : {booking.oneNightPrice} /-</Text>
+              <Text style={styles.subTextL1}>Amount paid: ₹ {booking.price} /- 💰</Text>
               <TouchableOpacity style={[styles.button]} onPress={handleCancelReservation}>
                 <Text style={styles.buttonText}>Cancel Reservation</Text>
               </TouchableOpacity>
@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 2,
+    marginBottom:64,
   },
   blackSelection: {
     flex: 1,

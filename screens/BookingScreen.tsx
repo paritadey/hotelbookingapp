@@ -48,7 +48,7 @@ const BookingScreen: React.FC<Props> = ({ navigation, route }) => {
         id: key,
         ...data[key],
       }))
-      setData(bookingList.reverse());// Reverse the list to get descending order
+      setData(bookingList.reverse());
       setLoading(false);
     });
 
@@ -67,24 +67,50 @@ const BookingScreen: React.FC<Props> = ({ navigation, route }) => {
     console.log("Booked hotel details:", booking);
     navigation.navigate("BookedHotel", { booking })
   }
-  const UserItem: React.FC<{ booking: BookingList }> = ({ booking }) => (
-    <View>
-      <TouchableOpacity onPress={() => handleBookedHotelClick(booking)} style={styles.touchable}>
-        <View style={styles.itemContainer}>
-          <Image source={{ uri: 'https://i.pinimg.com/564x/80/0a/f0/800af0101b474de67b3d36ea7cac4711.jpg' }} style={styles.image} />
-          <View style={styles.textContainer}>
-            <Text style={styles.subtitle}>Your Booking is confirmed with {booking.hotelName}</Text>
-            <Text style={styles.subText}>Amount paid: ₹ {booking.price}</Text>
-            <View style={styles.dateContainer}>
-              <Text style={styles.checkIn}>Check-In {"\n"} {booking.checkIn}</Text>
-              <Text style={styles.checkOut}>Check-Out {"\n"} {booking.checkOut}</Text>
+
+  const UserItem: React.FC<{ booking: BookingList }> = ({ booking }) => {
+
+    // Function to check if the checkIn date is in the past
+    const isCheckInDateOld = (checkInDate: string): boolean => {
+      const currentDate = new Date();
+      const checkIn = new Date(checkInDate); // Convert checkIn string to a Date object
+
+      return checkIn < currentDate; // Return true if checkIn is earlier than the current date
+    };
+
+    // Use the function to check if check-in is old
+    const isOld = isCheckInDateOld(booking.checkIn);
+
+    return (
+      <View>
+        <TouchableOpacity onPress={() => handleBookedHotelClick(booking)} style={styles.touchable}>
+          <View style={styles.itemContainer}>
+            <Image
+              source={{ uri: 'https://i.pinimg.com/564x/80/0a/f0/800af0101b474de67b3d36ea7cac4711.jpg' }}
+              style={styles.image}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.subtitle}>Your Booking is confirmed with {booking.hotelName}</Text>
+              <Text style={styles.subText}>Amount paid: ₹ {booking.price} /-</Text>
+              {isOld ? (
+                <View style={styles.line} />
+              ) : (<View style={styles.greenLine} />
+              )}
+              <View style={styles.dateContainer}>
+                <Text style={styles.checkIn}>
+                  Check-In {"\n"} {booking.checkIn} {isOld ? '(Past)' : '(Upcoming)'}
+                </Text>
+                <Text>➡️</Text>
+                <Text style={styles.checkOut}>
+                  Check-Out {"\n"} {booking.checkOut}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-      </TouchableOpacity>
-
-    </View>
-  );
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -95,7 +121,7 @@ const BookingScreen: React.FC<Props> = ({ navigation, route }) => {
           keyExtractor={(item) => item.hotelName}
         />
       ) : (
-        <Text>No data available</Text>
+        <Text style={styles.noData}>No data available. You have not booked any hotels yet!</Text>
       )}
     </View>
   )
@@ -184,4 +210,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  noData: {
+    width: '100%',
+    fontSize: 16,
+    color: '#000000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 24,
+    fontFamily: 'PlusJakartaSans-MediumItalic'
+  },
+  line: {
+    height: 4, // Line thickness
+    backgroundColor: 'red', // Line color
+  },
+  greenLine: {
+    height: 4, // Line thickness
+    backgroundColor: 'green', // Line color
+  }
 })
