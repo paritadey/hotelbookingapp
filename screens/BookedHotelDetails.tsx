@@ -22,24 +22,48 @@ const BookedHotelDetails: React.FC<Props> = ({ navigation, route }) => {
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
-  const handleCancelReservation = () => {
-    Alert.alert(
-      "Cancelation",
-      "Do you want to cancel the booking ?",
-      [
-        {
-          text: "No",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel"
-        },
-        {
-          text: "Yes",
-          onPress: () => updateDatabase()
-        }
-      ],
-      { cancelable: false }   
-    );
+  const isCheckInDateOld = (checkInDate: string): boolean => {
+    const currentDate = new Date();
+    const checkIn = new Date(checkInDate); // Convert checkIn string to a Date object
 
+    return checkIn < currentDate; // Return true if checkIn is earlier than the current date
+  };
+
+  // Use the function to check if check-in is old
+  const isOld = isCheckInDateOld(booking.checkIn);
+
+  const handleCancelReservation = () => {
+    if (isOld) {
+      Alert.alert(
+        "Cancelation",
+        "You cannot cancel past booking.",
+        [
+          {
+            text: "Ok",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+        ],
+        { cancelable: false }
+      );
+    } else {
+      Alert.alert(
+        "Cancelation",
+        "Do you want to cancel the booking ?",
+        [
+          {
+            text: "No",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+          {
+            text: "Yes",
+            onPress: () => updateDatabase()
+          }
+        ],
+        { cancelable: false }
+      );
+    }
   }
 
   const updateDatabase = async () => {
@@ -87,7 +111,7 @@ const BookedHotelDetails: React.FC<Props> = ({ navigation, route }) => {
               <Text style={styles.subText}> Per Night Hotel Price : {booking.oneNightPrice} /-</Text>
               <Text style={styles.subTextL1}>Amount paid: ₹ {booking.price} /- 💰</Text>
               <TouchableOpacity style={[styles.button]} onPress={handleCancelReservation}>
-                <Text style={styles.buttonText}>Cancel Reservation</Text>
+                <Text style={styles.buttonText}>{isOld ? 'Past Reservation' : 'Cancel Reservation'} </Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
@@ -121,7 +145,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 2,
-    marginBottom:64,
+    marginBottom: 64,
   },
   blackSelection: {
     flex: 1,
