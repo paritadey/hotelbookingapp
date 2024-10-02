@@ -27,6 +27,10 @@
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
 }
-[GMSServices provideAPIKey:@"AIzaSyDP_sxpdhjZvaBWcFc8T5n2ah0wcqRrefk"];
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+  [GMSServices provideAPIKey:@"AIzaSyDP_sxpdhjZvaBWcFc8T5n2ah0wcqRrefk"]; // Add this line
+  return YES;
+}
 
 @end

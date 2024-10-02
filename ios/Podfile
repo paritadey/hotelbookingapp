@@ -37,4 +37,8 @@ target 'hotelbookingapp' do
       # :ccache_enabled => true
     )
   end
+  
+  pod 'GoogleMaps'
+  pod 'Google-Maps-iOS-Utils' # Optional but useful for utilities like markers clustering
+
 end
