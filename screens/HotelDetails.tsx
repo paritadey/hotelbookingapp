@@ -213,7 +213,7 @@ const HotelDetails = ({ route, navigation }: NativeStackScreenProps<RootStackPar
                       <Icon name="arrow-back" size={24} color="#000" />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => toggleModal(latitude, longitude, displayDataInstance.title, displayDataInstance.location.address, displayDataInstance.getSummary(), displayDataInstance.getAmenitiesList(), priceForDisplay)}>
-                      <Text style={styles.text}>{displayDataInstance.title}</Text>
+                      <Text style={styles.text}>{displayDataInstance.title}  🗺️</Text>
                     </TouchableOpacity>
                     <AddressModal isVisible={isModalVisible} latitude={latitude} longitude={longitude} hotelAddress={displayDataInstance.location.address} hotelName={displayDataInstance.title}
                       onClose={() => toggleModal(latitude, longitude, displayDataInstance.title, displayDataInstance.location.address, displayDataInstance.getSummary(), displayDataInstance.getAmenitiesList(), priceForDisplay)} />

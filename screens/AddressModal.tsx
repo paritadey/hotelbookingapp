@@ -1,4 +1,4 @@
-import { Modal, View, Text, StyleSheet, TouchableOpacity, Button } from 'react-native';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import React from 'react'
 import { Double } from 'react-native/Libraries/Types/CodegenTypes';
