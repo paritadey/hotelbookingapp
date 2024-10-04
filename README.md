@@ -55,7 +55,7 @@ Now that you have successfully run the app, let's modify it.
 
 You've successfully run and modified your React Native App. :partying_face:
 
-About the Application:
+## About the Application:
 
 1. We have used Splash screen, SignUp/SignIn. We have used **AsyncStorage** to store login credentials in the device.
 2. We have fetched **current location** with the address.
